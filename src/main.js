@@ -4,7 +4,7 @@ import router from './plugins/router.js'
 import './assets/css/global.css'
 
 //插件
-import './plugins/elementUI.js'
+import './plugins/element.js'
 
 import axios from './plugins/axios.js'
 // 类似全局事件总线，所有组件都能直接调用

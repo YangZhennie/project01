@@ -40,7 +40,7 @@
 
 <script>
 export default {
-  name: "Login",
+  name: "myLogin",
   data(){
     return {
       loginForm: {
@@ -68,7 +68,6 @@ export default {
           alert('用户名或密码输入不正确！')
         }else{
           const {data} = await this.$http.post('login',this.loginForm)
-          console.log(data)
           if(data.meta.status!==200) {this.$message.error(data.meta.msg); return}
           else {
             //提示弹窗

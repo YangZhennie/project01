@@ -1,21 +1,32 @@
 <template>
-  <button @click="tuichu">退出登录</button>
+  <el-container class="home-container">
+    <HomeHeader />
+    <el-container>
+      <HomeAside />
+      <HomeMain />
+    </el-container>
+  </el-container>
 </template>
 
 <script>
+import HomeHeader from "./HomeHeader";
+import HomeAside from "./HomeAside";
+import HomeMain from "./HomeMain";
+
 export default {
-    name:'Home',
-    methods:{
-        tuichu(){
-            //清空token
-            sessionStorage.clear()
-            //自动跳转登录页
-            this.$router.replace('/login')
-        }
-    }
-}
+  name: "myHome",
+  components: {
+    HomeHeader,
+    HomeAside,
+    HomeMain,
+  },
+  methods: {},
+};
 </script>
 
-<style>
-
+<style scoped>
+/* 固定顶部和侧边栏，滑动main，采用子绝父相的形式 */
+.home-container {
+  height: 100%;
+}
 </style>

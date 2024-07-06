@@ -1,22 +1,17 @@
 <template>
-  <el-main>
+  <el-main> 
+    <router-view></router-view>
   </el-main>
 </template>
 
 <script>
 export default {
-    name:'HomeMain',
-}
+  name: "HomeMain",
+};
 </script>
 
 <style scoped>
-.el-main{
-    position:absolute;
-    left:200px;
-    top:60px;
-    right:0px;
-    bottom:0px;
-    overflow-y: scroll;
-    background-color: aliceblue;
+.el-main {
+  background-color: aliceblue;
 }
 </style>

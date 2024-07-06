@@ -1,23 +1,28 @@
 <template>
-  <el-aside width="200px">
+  <el-aside :width="die? '64px':'200px'">
     <el-menu 
+        router
+        :collapse="die"
+        :collapse-transition="false"
         unique-opened
         background-color="rgb(15, 61, 109)"
         text-color="#fff"
         active-text-color="#409EFF">
-        <!-- 一级菜单 -->
+      <div class="zhedie" @click="zhedie">|||</div>
+
       <el-submenu :index="`${item.id}`" v-for="item in menuList" :key="item.id">
-        <!-- 菜单模块：包含图标和文字 -->
+        <!-- 一级菜单 -->
         <template slot="title">
           <i class="el-icon-location"></i>
           <span>{{item.authName}}</span>
         </template>
           <!-- 二级菜单 -->
-          <el-menu-item :index="`${obj.id}`" v-for="obj in item.children" :key="obj.id">
-          <i class="el-icon-menu"></i>
-          <span>{{obj.authName}}</span>
+          <el-menu-item :index="`${obj.path}`" v-for="obj in item.children" :key="obj.id">
+            <i class="el-icon-menu"></i>
+            <span>{{obj.authName}}</span>
           </el-menu-item>
       </el-submenu>
+
     </el-menu>
   </el-aside>
 </template>
@@ -28,6 +33,7 @@ export default {
     data(){
       return{
         menuList:'',
+        die:false,
       }
     },
     // 数据监测，代理完成后，可以用methods方法
@@ -44,6 +50,9 @@ export default {
           //将获取到的数据赋给存储data，便于后续渲染页面
           this.menuList = data.data
 
+      },
+      zhedie(){
+        this.die = !this.die
       }
     }
 }
@@ -51,13 +60,17 @@ export default {
 
 <style scoped>
 .el-aside{
-    position:absolute;
-    top:60px;
-    bottom:0px;
-    left:0px;
     background-color: rgb(15, 61, 109);
 }
 .el-menu{
   border-right:none;
+}
+.zhedie{
+  width:100%;
+  height:30px;
+  line-height:30px;
+  background-color: rgb(41, 59, 118);
+  color:aliceblue;
+  text-align:center;
 }
 </style>

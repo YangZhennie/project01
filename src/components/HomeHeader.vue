@@ -24,7 +24,6 @@ export default {
 
 <style scoped>
 .el-header{
-    position:relative;
     width:100%;
     background-color: rgb(1, 73, 117);
     font-size:20px;
@@ -32,7 +31,6 @@ export default {
     display:flex;
     justify-content:space-between;
     align-items:center;
-
 }
 .el-header div {
     display:flex;

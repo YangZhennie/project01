@@ -1,11 +1,11 @@
 <template>
-  <el-container class="home-container">
-    <HomeHeader />
-    <el-container>
-      <HomeAside />
-      <HomeMain />
-    </el-container>
+  <el-container class="home-container" direction="vertical">
+    <HomeHeader/>
+  <el-container>
+      <HomeAside/>
+      <HomeMain/>
   </el-container>
+</el-container>
 </template>
 
 <script>
@@ -25,8 +25,8 @@ export default {
 </script>
 
 <style scoped>
-/* 固定顶部和侧边栏，滑动main，采用子绝父相的形式 */
 .home-container {
   height: 100%;
 }
+
 </style>

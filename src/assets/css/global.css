@@ -9,3 +9,6 @@ html, body, #app {
 body {
     font-family: sans-serif;
 }
+.el-breadcrumb{
+    margin-bottom: 15px;
+}

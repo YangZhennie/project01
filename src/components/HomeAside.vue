@@ -2,6 +2,8 @@
   <el-aside :width="die? '64px':'200px'">
     <el-menu 
         router
+        :default-active="menuIndex"
+        @select="getMenuIndex"
         :collapse="die"
         :collapse-transition="false"
         unique-opened
@@ -17,7 +19,8 @@
           <span>{{item.authName}}</span>
         </template>
           <!-- 二级菜单 -->
-          <el-menu-item :index="`${obj.path}`" v-for="obj in item.children" :key="obj.id">
+          <el-menu-item 
+          :index="`${obj.path}`" v-for="obj in item.children" :key="obj.id">
             <i class="el-icon-menu"></i>
             <span>{{obj.authName}}</span>
           </el-menu-item>
@@ -34,12 +37,17 @@ export default {
       return{
         menuList:'',
         die:false,
+        menuIndex:'',
       }
     },
     // 数据监测，代理完成后，可以用methods方法
     // 进入首页前需要获取菜单数据
     created(){
       this.getMenuList()
+    },
+    //页面每次刷新后，都要获取当前的路由path以高亮对应的二级菜单
+    mounted(){
+      this.menuIndex=sessionStorage.getItem('activeMenu')
     },
     methods:{
       async getMenuList(){
@@ -53,6 +61,10 @@ export default {
       },
       zhedie(){
         this.die = !this.die
+      },
+      getMenuIndex(index){
+        sessionStorage.setItem('activeMenu',index)
+        this.menuIndex=index
       }
     }
 }
@@ -74,3 +86,4 @@ export default {
   text-align:center;
 }
 </style>
+

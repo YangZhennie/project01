@@ -23,7 +23,7 @@
         >添加用户</el-button
       >
       <el-dialog
-        @close="unshow"
+        @close="unshow('newUser')"
         title="添加用户"
         :visible.sync="dialogVisible"
         width="50%"
@@ -72,18 +72,26 @@
         </el-table-column>
         <el-table-column prop="address" label="操作">
           <template v-slot:="scope">
+            <!-- 修改 -->
             <el-button
               type="primary"
               icon="el-icon-edit"
               circle
               size="mini"
+              @click="getUsermsg(scope.row)"
+              @close="unshow"
             ></el-button>
+
+            <!-- 删除 -->
             <el-button
               type="danger"
               icon="el-icon-delete"
               circle
               size="mini"
+              @click="showMessage(scope.row.id)"
             ></el-button>
+
+            <!-- 设置 -->
             <el-tooltip
               class="item"
               effect="dark"
@@ -101,7 +109,39 @@
           </template>
         </el-table-column>
       </el-table>
-
+    <!-- 修改弹窗 -->
+    <!-- 使用场景：用户点击某行按钮弹出窗口，并显示该行数据
+    问题：利用组件的scope.row可获取改行数据，当不要将弹窗卸载表格的</el-table-column>里，因为整列都会执行该命令，
+    且表单数据会依次被后一行覆盖
+    解决：写在表格外面，点击某一行时调用点击事件，传入用户数据参数，赋给data的editUser，再用v-model显示在表单 -->
+      <el-dialog
+        @close="unshow('editUser')"
+        title="修改用户"
+        :visible.sync="editVisible"
+        width="50%"
+      >
+        <el-form
+          :model="editUser"
+          :rules="newRules"
+          ref="editUser"
+          label-width="100px"
+          class="demo-ruleForm"
+        > 
+        <el-form-item label="用户名">
+            <el-input :value="editUser.username" disabled></el-input>
+          </el-form-item>
+          <el-form-item label="邮箱" prop="email">
+            <el-input v-model="editUser.email"></el-input>
+          </el-form-item>
+          <el-form-item label="电话" prop="mobile">
+            <el-input v-model="editUser.mobile"></el-input>
+          </el-form-item>
+        </el-form>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="editVisible = false">取 消</el-button>
+          <el-button type="primary" @click="changeUser">确 定</el-button>
+        </span>
+      </el-dialog>
       <!-- 分页 -->
       <el-pagination
         @size-change="handleSizeChange"
@@ -118,10 +158,11 @@
 </template>
 
 <script>
+
 export default {
   name: "Users",
   data() {
-    //定义两个验证规则
+    //自定义两个验证规则
     //验证邮箱
     const validateEmail = (rule, value, callback) => {
       if (!value) {
@@ -147,14 +188,24 @@ export default {
       } else callback();
     };
     return {
+      // 用户列表
       userList: [],
       total: 0,
+      // 添加用户
       newUser: {
         username: "",
         password: "",
         email: "",
         mobile: "",
       },
+      // 修改用户
+      editUser:{
+        id:"",
+        username: "",
+        email: "",
+        mobile: "",
+      },
+      // 校验规则
       newRules: {
         username: [
           { required: true, message: "用户名不能为空！", trigger: "blur" },
@@ -165,12 +216,15 @@ export default {
         email: [{ validator: validateEmail, trigger: "blur" }],
         mobile: [{ validator: validateMobile, trigger: "blur" }],
       },
+      //请求参数
       params: {
         query: "",
         pagenum: 1,
         pagesize: 4,
       },
+      //不同弹窗的显示状态
       dialogVisible: false,
+      editVisible:false,
     };
   },
   created() {
@@ -186,6 +240,18 @@ export default {
     },
   },
   methods: {
+    //错误弹窗提示
+    errorDialog(data){
+      if (data.meta.status !== 200) {
+        this.$message.error(data.meta.msg);
+        return
+      }
+    },
+    //关闭弹窗时清除初始化并移除校验结果
+    unshow(form) {
+      this.$refs[form].resetFields();
+    },
+    //获取服务器用户数据
     async getUsers() {
       const { data } = await this.$http.get("users", { params: this.params });
       if (data.meta.status !== 200) {
@@ -195,6 +261,7 @@ export default {
       this.userList = data.data.users;
       this.total = data.data.total;
     },
+    // 分页
     handleSizeChange(pageSize) {
       this.params.pagesize = pageSize;
       this.getUsers();
@@ -203,6 +270,7 @@ export default {
       this.params.pagenum = currentPage;
       this.getUsers();
     },
+    // 修改状态
     async changeStatus(status) {
       const { data } = await this.$http.put(
         `users/${status.id}/state/${status.mg_state}`
@@ -216,9 +284,7 @@ export default {
         type: "success",
       });
     },
-    unshow() {
-      this.$refs.newUser.resetFields();
-    },
+    // 新增用户
     addUser() {
       //表单提交前要进行校验
       this.$refs.newUser.validate(async (isTrue, obj) => {
@@ -239,9 +305,47 @@ export default {
           message: "添加成功！",
           type: "success",
         });
-        this.getUsers();
+        this.getUsers()
       });
     },
+    //根据id获取某个用户数据
+    getUsermsg(obj){
+      //显示弹窗
+      this.editVisible = true
+      this.editUser.id = obj.id
+      this.editUser.username = obj.username
+      this.editUser.email = obj.email
+      this.editUser.mobile = obj.mobile
+    },
+    //修改用户
+    changeUser(){
+      //提交前预验证
+      this.$refs.editUser.validate(async(boolean, object)=>{
+        if(!boolean){this.$message.error('输入格式错误！');return}
+        const {id,email,mobile} = this.editUser
+        //将数据提交到服务器
+        const {data} = await this.$http.put('users/'+id,{id,email,mobile})
+        this.errorDialog(data)
+        // 更新后关闭弹窗，更新页面表格数据
+        this.$message({message:'更新成功！',type:'success'})
+        this.editVisible = false
+        this.getUsers()
+      })
+    },
+    //错误弹窗
+    async showMessage(id){
+      // 当点击确认，pormise对象返回字符串confirm,取消返回cancel
+        const a = await this.$confirm('此操作将永久删除管理员, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+          }).catch(error=>error)
+        if(a==='cancel') return
+        const {data} = await this.$http.delete('users/'+id)
+        this.errorDialog(data)
+        this.$message.success('删除成功！')
+        this.getUsers()
+    }
   },
 };
 </script>

@@ -3,12 +3,17 @@
     margin: 0;
     padding: 0;
 }
-html, body, #app {
+
+html,
+body,
+#app {
     height: 100%;
 }
+
 body {
     font-family: sans-serif;
 }
-.el-breadcrumb{
+
+.el-breadcrumb {
     margin-bottom: 15px;
 }

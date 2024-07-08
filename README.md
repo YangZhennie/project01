@@ -13,3 +13,5 @@
 需求：用户刷新仍高亮当前菜单；
 原理：default-active控制高亮（需要index），通过获取/设置sessionStorage存储的index，影响数据，从而影响default-active属性
 问题：问什么不直接将index存在data里？答：防止刷新时data又为空，存在浏览器可以在刷新时通过生命周期获取index
+
+**用户模块**：用户的增删改查，分页

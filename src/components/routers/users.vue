@@ -1,10 +1,6 @@
 <template>
   <div>
-    <el-breadcrumb separator-class="el-icon-arrow-right">
-      <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
-      <el-breadcrumb-item>用户管理</el-breadcrumb-item>
-      <el-breadcrumb-item>用户列表</el-breadcrumb-item>
-    </el-breadcrumb>
+    <Bread name1="用户管理" name2="用户列表"></Bread>
 
     <el-card class="box-card">
       <!-- 搜索用户 -->
@@ -20,8 +16,7 @@
         ></el-button>
       </el-input>
       <el-button type="primary" @click="dialogVisible = true"
-        >添加用户</el-button
-      >
+        >添加用户</el-button>
       <el-dialog
         @close="unshow('newUser')"
         title="添加用户"
@@ -104,6 +99,7 @@
                 icon="el-icon-setting"
                 circle
                 size="mini"
+                @click="setRole(scope.row)"
               ></el-button>
             </el-tooltip>
           </template>
@@ -140,6 +136,31 @@
         <span slot="footer" class="dialog-footer">
           <el-button @click="editVisible = false">取 消</el-button>
           <el-button type="primary" @click="changeUser">确 定</el-button>
+        </span>
+      </el-dialog>
+      <!-- 分配角色弹窗 -->
+      <el-dialog
+        title="分配角色"
+        :visible.sync="setDialogVisible"
+        width="30%"
+        >
+        <div>
+          <p>当前用户：{{userinfo.username}}</p>
+          <p>当前角色：{{userinfo.role_name}}</p>
+          <p>角色选择：
+              <el-select v-model="value" placeholder="请选择">
+                <el-option
+                  v-for="item in roleList"
+                  :key="item.id"
+                  :label="item.roleName"
+                  :value="item.id">
+                </el-option>
+              </el-select>
+          </p>
+        </div>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="setDialogVisible = false">取 消</el-button>
+          <el-button type="primary" @click="changeRole">确 定</el-button>
         </span>
       </el-dialog>
       <!-- 分页 -->
@@ -222,9 +243,14 @@ export default {
         pagenum: 1,
         pagesize: 4,
       },
+      //用户分配角色时的基本信息
+      userinfo:'',
+      roleList:[],
+      value:'',
       //不同弹窗的显示状态
       dialogVisible: false,
       editVisible:false,
+      setDialogVisible:false,
     };
   },
   created() {
@@ -240,14 +266,7 @@ export default {
     },
   },
   methods: {
-    //错误弹窗提示
-    errorDialog(data){
-      if (data.meta.status !== 200) {
-        this.$message.error(data.meta.msg);
-        return
-      }
-    },
-    //关闭弹窗时清除初始化并移除校验结果
+
     unshow(form) {
       this.$refs[form].resetFields();
     },
@@ -325,7 +344,7 @@ export default {
         const {id,email,mobile} = this.editUser
         //将数据提交到服务器
         const {data} = await this.$http.put('users/'+id,{id,email,mobile})
-        this.errorDialog(data)
+        this.$errorDialog(data)
         // 更新后关闭弹窗，更新页面表格数据
         this.$message({message:'更新成功！',type:'success'})
         this.editVisible = false
@@ -342,10 +361,33 @@ export default {
           }).catch(error=>error)
         if(a==='cancel') return
         const {data} = await this.$http.delete('users/'+id)
-        this.errorDialog(data)
+        this.$errorDialog(data)
         this.$message.success('删除成功！')
         this.getUsers()
-    }
+    },
+    // 显示角色
+    async setRole(obj){
+      
+      //获取角色列表
+      const {data}=await this.$http.get('roles')
+      this.$errorDialog(data)
+      this.roleList=data.data
+      // 先把用户和原来角色名显示弹窗
+      this.userinfo=obj
+      this.setDialogVisible=true
+    },
+    //修改角色
+    async changeRole(){
+      //通过选择器的value数据判断用户是否选择
+      if(!this.value) {this.$message.error('修改失败！');return}
+      const {data}=await this.$http.put(`users/${this.userinfo.id}/role`,{rid:this.value})
+      this.$errorDialog(data)
+      this.$message({message:data.meta.msg,type:'success'})
+      console.log(data)
+      this.getUsers()
+      this.setDialogVisible=false
+      this.value=''
+    },
   },
 };
 </script>

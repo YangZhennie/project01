@@ -40,7 +40,6 @@ export default {
       const {data} = await this.$http.get('rights/list')
       this.$errorDialog(data)
       this.rightsData = data.data
-      console.log(data.data)
     },
 
   }

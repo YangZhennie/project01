@@ -4,8 +4,7 @@
     <!-- 卡片 -->
     <el-card class="box-card">
       <el-button type="primary" @click="dialogVisible = true"
-        >添加角色</el-button
-      >
+        >添加角色</el-button>
       <el-dialog
         @close="unshow('newRole')"
         title="添加角色"
@@ -223,28 +222,10 @@ export default {
     //添加角色
     addRole() {
       //表单提交前要进行校验
-      this.$refs.newRole.validate(async (isTrue, obj) => {
-        if (!isTrue) {
-          this.$message.error("提交失败，请确认输入格式！");
-          return;
-        }
-        //验证为true则提交到服务器
-        const { data } = await this.$http.post("roles", this.newRole);
-        console.log(data);
-        if (data.meta.status !== 201) {
-          this.$message.error(data.meta.msg);
-          return;
-        }
-        //提交成功后关闭表单，并弹出提示框，再重新渲染用户数据
-        this.dialogVisible = false;
-        this.$message({
-          message: "添加成功！",
-          type: "success",
-        });
-        this.getRolesList();
-      });
+      this.$addItem(this.$refs.newRole, "roles", this.newRole,this.getRolesList)
+      this.dialogVisible = false
     },
-    // 修改角色
+    // 显示角色
     getRolemsg(obj) {
       //显示弹窗
       this.editVisible = true;
@@ -252,26 +233,11 @@ export default {
       this.editRole.roleName = obj.roleName;
       this.editRole.roleDesc = obj.roleDesc;
     },
+    // 修改角色
     changeRole() {
       //提交前预验证
-      this.$refs.editRole.validate(async (boolean, object) => {
-        if (!boolean) {
-          this.$message.error("输入格式错误！");
-          return;
-        }
-        const { id, roleName, roleDesc } = this.editRole;
-        //将数据提交到服务器
-        const { data } = await this.$http.put("roles/" + id, {
-          id,
-          roleName,
-          roleDesc,
-        });
-        this.$errorDialog(data);
-        // 更新后关闭弹窗，更新页面表格数据
-        this.$message({ message: "更新成功！", type: "success" });
-        this.editVisible = false;
-        this.getRolesList();
-      });
+      this.$changeItem(this.$refs.editRole,"roles/" + this.editRole.id,this.editRole,this.getRolesList)
+      this.editVisible = false
     },
     // 删除角色
     async delRole(id) {

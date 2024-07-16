@@ -16,7 +16,8 @@
         ></el-button>
       </el-input>
       <el-button type="primary" @click="dialogVisible = true"
-        >添加用户</el-button>
+        >添加用户</el-button
+      >
       <el-dialog
         @close="unshow('newUser')"
         title="添加用户"
@@ -105,8 +106,8 @@
           </template>
         </el-table-column>
       </el-table>
-    <!-- 修改弹窗 -->
-    <!-- 使用场景：用户点击某行按钮弹出窗口，并显示该行数据
+      <!-- 修改弹窗 -->
+      <!-- 使用场景：用户点击某行按钮弹出窗口，并显示该行数据
     问题：利用组件的scope.row可获取改行数据，当不要将弹窗卸载表格的</el-table-column>里，因为整列都会执行该命令，
     且表单数据会依次被后一行覆盖
     解决：写在表格外面，点击某一行时调用点击事件，传入用户数据参数，赋给data的editUser，再用v-model显示在表单 -->
@@ -122,8 +123,8 @@
           ref="editUser"
           label-width="100px"
           class="demo-ruleForm"
-        > 
-        <el-form-item label="用户名">
+        >
+          <el-form-item label="用户名">
             <el-input :value="editUser.username" disabled></el-input>
           </el-form-item>
           <el-form-item label="邮箱" prop="email">
@@ -139,23 +140,21 @@
         </span>
       </el-dialog>
       <!-- 分配角色弹窗 -->
-      <el-dialog
-        title="分配角色"
-        :visible.sync="setDialogVisible"
-        width="30%"
-        >
+      <el-dialog title="分配角色" :visible.sync="setDialogVisible" width="30%">
         <div>
-          <p>当前用户：{{userinfo.username}}</p>
-          <p>当前角色：{{userinfo.role_name}}</p>
-          <p>角色选择：
-              <el-select v-model="value" placeholder="请选择">
-                <el-option
-                  v-for="item in roleList"
-                  :key="item.id"
-                  :label="item.roleName"
-                  :value="item.id">
-                </el-option>
-              </el-select>
+          <p>当前用户：{{ userinfo.username }}</p>
+          <p>当前角色：{{ userinfo.role_name }}</p>
+          <p>
+            角色选择：
+            <el-select v-model="value" placeholder="请选择">
+              <el-option
+                v-for="item in roleList"
+                :key="item.id"
+                :label="item.roleName"
+                :value="item.id"
+              >
+              </el-option>
+            </el-select>
           </p>
         </div>
         <span slot="footer" class="dialog-footer">
@@ -179,7 +178,6 @@
 </template>
 
 <script>
-
 export default {
   name: "Users",
   data() {
@@ -220,8 +218,8 @@ export default {
         mobile: "",
       },
       // 修改用户
-      editUser:{
-        id:"",
+      editUser: {
+        id: "",
         username: "",
         email: "",
         mobile: "",
@@ -244,13 +242,13 @@ export default {
         pagesize: 4,
       },
       //用户分配角色时的基本信息
-      userinfo:'',
-      roleList:[],
-      value:'',
+      userinfo: "",
+      roleList: [],
+      value: "",
       //不同弹窗的显示状态
       dialogVisible: false,
-      editVisible:false,
-      setDialogVisible:false,
+      editVisible: false,
+      setDialogVisible: false,
     };
   },
   created() {
@@ -266,7 +264,6 @@ export default {
     },
   },
   methods: {
-
     unshow(form) {
       this.$refs[form].resetFields();
     },
@@ -277,6 +274,7 @@ export default {
         this.$message.error(data.meta.msg);
         return;
       }
+      console.log(data)
       this.userList = data.data.users;
       this.total = data.data.total;
     },
@@ -294,10 +292,7 @@ export default {
       const { data } = await this.$http.put(
         `users/${status.id}/state/${status.mg_state}`
       );
-      if (data.meta.status !== 200) {
-        this.$message.error(data.meta.msg);
-        return;
-      }
+      this.$errorDialog(data)
       this.$message({
         message: data.meta.msg,
         type: "success",
@@ -305,88 +300,68 @@ export default {
     },
     // 新增用户
     addUser() {
-      //表单提交前要进行校验
-      this.$refs.newUser.validate(async (isTrue, obj) => {
-        if (!isTrue) {
-          this.$message.error("提交失败，请确认输入格式！");
-          return;
-        }
-        //验证为true则提交到服务器
-        const { data } = await this.$http.post("users", this.newUser);
-        console.log(data);
-        if (data.meta.status !== 201) {
-          this.$message.error(data.meta.msg);
-          return;
-        }
-        //提交成功后关闭表单，并弹出提示框，再重新渲染用户数据
-        this.dialogVisible = false;
-        this.$message({
-          message: "添加成功！",
-          type: "success",
-        });
-        this.getUsers()
-      });
+      //表单提交前要进行校验      
+      this.$addItem(this.$refs.newUser, "users", this.newUser, this.getUsers)
+      this.dialogVisible = false
     },
     //根据id获取某个用户数据
-    getUsermsg(obj){
+    getUsermsg(obj) {
       //显示弹窗
-      this.editVisible = true
-      this.editUser.id = obj.id
-      this.editUser.username = obj.username
-      this.editUser.email = obj.email
-      this.editUser.mobile = obj.mobile
+      this.editVisible = true;
+      this.editUser.id = obj.id;
+      this.editUser.username = obj.username;
+      this.editUser.email = obj.email;
+      this.editUser.mobile = obj.mobile;
     },
     //修改用户
-    changeUser(){
+    changeUser() {
       //提交前预验证
-      this.$refs.editUser.validate(async(boolean, object)=>{
-        if(!boolean){this.$message.error('输入格式错误！');return}
-        const {id,email,mobile} = this.editUser
-        //将数据提交到服务器
-        const {data} = await this.$http.put('users/'+id,{id,email,mobile})
-        this.$errorDialog(data)
-        // 更新后关闭弹窗，更新页面表格数据
-        this.$message({message:'更新成功！',type:'success'})
-        this.editVisible = false
-        this.getUsers()
-      })
+      this.$changeItem(this.$refs.editUser,"users/" + this.editUser.id,this.editUser,this.getUsers)
+      this.editVisible = false
     },
     //错误弹窗
-    async showMessage(id){
+    async showMessage(id) {
       // 当点击确认，pormise对象返回字符串confirm,取消返回cancel
-        const a = await this.$confirm('此操作将永久删除管理员, 是否继续?', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-          }).catch(error=>error)
-        if(a==='cancel') return
-        const {data} = await this.$http.delete('users/'+id)
-        this.$errorDialog(data)
-        this.$message.success('删除成功！')
-        this.getUsers()
+      const a = await this.$confirm(
+        "此操作将永久删除管理员, 是否继续?",
+        "提示",
+        {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning",
+        }
+      ).catch((error) => error);
+      if (a === "cancel") return;
+      const { data } = await this.$http.delete("users/" + id);
+      this.$errorDialog(data);
+      this.$message.success("删除成功！");
+      this.getUsers();
     },
     // 显示角色
-    async setRole(obj){
-      
+    async setRole(obj) {
       //获取角色列表
-      const {data}=await this.$http.get('roles')
-      this.$errorDialog(data)
-      this.roleList=data.data
+      const { data } = await this.$http.get("roles");
+      this.$errorDialog(data);
+      this.roleList = data.data;
       // 先把用户和原来角色名显示弹窗
-      this.userinfo=obj
-      this.setDialogVisible=true
+      this.userinfo = obj;
+      this.setDialogVisible = true;
     },
-    //修改角色
-    async changeRole(){
+    //分配角色
+    async changeRole() {
       //通过选择器的value数据判断用户是否选择
-      if(!this.value) {this.$message.error('修改失败！');return}
-      const {data}=await this.$http.put(`users/${this.userinfo.id}/role`,{rid:this.value})
-      this.$errorDialog(data)
-      this.$message({message:data.meta.msg,type:'success'})
-      console.log(data)
-      this.getUsers()
-      this.setDialogVisible=false
-      this.value=''
+      if (!this.value) {
+        this.$message.error("修改失败！");
+        return;
+      }
+      const { data } = await this.$http.put(`users/${this.userinfo.id}/role`, {
+        rid: this.value,
+      });
+      this.$errorDialog(data);
+      this.$message({ message: data.meta.msg, type: "success" });
+      this.getUsers();
+      this.setDialogVisible = false;
+      this.value = "";
     },
   },
 };

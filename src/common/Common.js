@@ -18,7 +18,8 @@ export const addItem = function (form, path, params, getFunction) {
         }
         //验证为true则提交到服务器
         const { data } = await this.$http.post(path, params)
-        this.$errorDialog(data,201)
+        // 错误弹窗：返回值false则错误，true则正确
+        if (!this.$errorDialog(data,201)) return;
         //提交成功后弹出提示框，重新渲染数据
         this.$message({
             message: "添加成功！",
@@ -39,7 +40,8 @@ export const changeItem = function (form, path, params, getFunction){
         }
         //将数据提交到服务器
         const { data } = await this.$http.put(path, params)
-        this.$errorDialog(data)
+        // 错误弹窗：返回值false则错误，true则正确
+        if (!this.$errorDialog(data)) return;
         // 更新后关闭弹窗，更新页面表格数据
         this.$message({ message: "更新成功！", type: "success" })
         // 仅当 getFunction 存在时执行
@@ -47,3 +49,27 @@ export const changeItem = function (form, path, params, getFunction){
         
     });
 }
+
+//表单删除
+export const delItem = async function (path, getFunction) {
+    try {
+        const confirmation = await this.$confirm(
+            "此操作将永久删除, 是否继续?",
+            "提示",
+            {
+                confirmButtonText: "确定",
+                cancelButtonText: "取消",
+                type: "warning",
+            }
+        );
+        if (confirmation !== "confirm") return;
+        const { data } = await this.$http.delete(path);
+        if (!this.$errorDialog(data)) return;
+        this.$message.success("删除成功！");
+        getFunction();
+    } catch (error) {
+        console.error("Error during deletion:", error);
+        this.$message.error("删除过程中出现错误，请稍后再试！");
+    }
+};
+

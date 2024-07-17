@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- 面包屑导航 -->
-    <Bread name1="权限管理" name2="权限列表"></Bread>
+    <Bread nameone="权限管理" nametwo="权限列表"></Bread>
     <!-- 卡片 -->
     <el-card class="box-card">
       <el-table :data="rightsData" height="650" border style="width: 100%">

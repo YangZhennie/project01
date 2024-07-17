@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Bread name1="用户管理" name2="用户列表"></Bread>
+    <Bread nameone="用户管理" nametwo="用户列表"></Bread>
 
     <el-card class="box-card">
       <!-- 搜索用户 -->
@@ -16,8 +16,7 @@
         ></el-button>
       </el-input>
       <el-button type="primary" @click="dialogVisible = true"
-        >添加用户</el-button
-      >
+        >添加用户</el-button>
       <el-dialog
         @close="unshow('newUser')"
         title="添加用户"
@@ -274,7 +273,7 @@ export default {
         this.$message.error(data.meta.msg);
         return;
       }
-      console.log(data)
+      console.log(data);
       this.userList = data.data.users;
       this.total = data.data.total;
     },
@@ -292,7 +291,7 @@ export default {
       const { data } = await this.$http.put(
         `users/${status.id}/state/${status.mg_state}`
       );
-      this.$errorDialog(data)
+      this.$errorDialog(data);
       this.$message({
         message: data.meta.msg,
         type: "success",
@@ -300,9 +299,9 @@ export default {
     },
     // 新增用户
     addUser() {
-      //表单提交前要进行校验      
-      this.$addItem(this.$refs.newUser, "users", this.newUser, this.getUsers)
-      this.dialogVisible = false
+      //表单提交前要进行校验
+      this.$addItem(this.$refs.newUser, "users", this.newUser, this.getUsers);
+      this.dialogVisible = false;
     },
     //根据id获取某个用户数据
     getUsermsg(obj) {
@@ -316,8 +315,13 @@ export default {
     //修改用户
     changeUser() {
       //提交前预验证
-      this.$changeItem(this.$refs.editUser,"users/" + this.editUser.id,this.editUser,this.getUsers)
-      this.editVisible = false
+      this.$changeItem(
+        this.$refs.editUser,
+        "users/" + this.editUser.id,
+        this.editUser,
+        this.getUsers
+      );
+      this.editVisible = false;
     },
     //错误弹窗
     async showMessage(id) {

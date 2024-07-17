@@ -270,7 +270,6 @@ export default {
     },
     //修改分类名称
     changeCate() {
-      console.log(this.editCate);
       this.$changeItem(
         this.$refs.editCate,
         "categories/" + this.editCate.id,
@@ -280,7 +279,7 @@ export default {
       this.editVisible = false;
     },
     //删除分类
-    async delCate(id) {
+    async delCate(id) { 
       // 当点击确认，pormise对象返回字符串confirm,取消返回cancel
       const a = await this.$confirm(
         "此操作将永久删除该分类, 是否继续?",
@@ -296,11 +295,6 @@ export default {
       // 错误弹窗：返回值false则错误，true则正确
       if (!this.$errorDialog(data)) return;
       this.$message.success("删除成功！");
-      //判断当前的数据列表为空且不是第1页，则更新页码pageNum--
-      // if(this.cateList.length===0 && this.params.pagenum>1)
-      // {this.params.pagenum--
-      // this.getCateList();}
-
       //重新获取服务器数据，待total和cateList都更新后再判断
       this.getCateList();
     },
@@ -311,5 +305,8 @@ export default {
 <style scoped>
 .el-button {
   margin-bottom: 10px;
+}
+.el-cascader{
+    width:100%;
 }
 </style>

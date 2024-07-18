@@ -10,6 +10,8 @@ import rights from '../components/routers/Rights'
 import roles from '../components/routers/Roles'
 import category from '../components/routers/Cate'
 import params from '../components/routers/Params'
+import goodsList from '../components/routers/GoodsList'
+import add from '../components/routers/Add'
 Vue.use(VueRouter)
 
 //定义插件
@@ -60,6 +62,15 @@ const router = new VueRouter({
                     name: 'params',
                     path: '/params',
                     component: params,
+                },
+                {
+                    name:'goodslist',
+                    path:'/goods',
+                    component:goodsList,
+                },
+                {   name:'add',
+                    path:'/add',
+                    component:add
                 }
             ]
         },

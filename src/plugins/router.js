@@ -12,6 +12,8 @@ import category from '../components/routers/Cate'
 import params from '../components/routers/Params'
 import goodsList from '../components/routers/GoodsList'
 import add from '../components/routers/Add'
+import edit from '../components/routers/Edit'
+
 Vue.use(VueRouter)
 
 //定义插件
@@ -71,6 +73,11 @@ const router = new VueRouter({
                 {   name:'add',
                     path:'/add',
                     component:add
+                },
+                {
+                    name: 'edit',
+                    path: '/edit',
+                    component:edit
                 }
             ]
         },

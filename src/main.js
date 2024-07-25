@@ -24,4 +24,8 @@ Vue.config.productionTip = false
 new Vue({
   router,
   render: h => h(App),
+  beforeCreate() {
+    //$bus就是当前的vm
+    Vue.prototype.$bus = this
+  },
 }).$mount('#app')

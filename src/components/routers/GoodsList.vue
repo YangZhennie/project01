@@ -17,69 +17,6 @@
         ></el-button>
       </el-input>
       <el-button type="primary" @click="addGoods">添加商品</el-button>
-      <el-dialog
-        @close="unshow('newGoods')"
-        title="添加商品"
-        :visible.sync="dialogVisible"
-        width="50%"
-      >
-        <el-form
-          :model="newGoods"
-          :rules="newRules"
-          ref="newGoods"
-          label-width="100px"
-          class="demo-ruleForm"
-        >
-          <el-form-item label="商品名称" prop="goods_name">
-            <el-input v-model="newGoods.goods_name"></el-input>
-          </el-form-item>
-          <el-form-item label="','分割的分类列表" prop="goods_cat">
-            <!-- 级联选择器 -->
-            <el-cascader
-              clearable
-              v-model="newGoods.goods_cat"
-              :options="options"
-              :props="propOptions"
-              @change="handleChange"
-            >
-            </el-cascader>
-          </el-form-item>
-          <el-form-item label="价格" prop="goods_price">
-            <el-input v-model.number="newGoods.goods_price"></el-input>
-          </el-form-item>
-          <el-form-item label="数量" prop="goods_number">
-            <el-input v-model.number="newGoods.goods_number"></el-input>
-          </el-form-item>
-          <el-form-item label="重量" prop="goods_weight">
-            <el-input v-model.number="newGoods.goods_weight"></el-input>
-          </el-form-item>
-          <el-form-item label="介绍">
-            <el-input v-model="newGoods.goods_introduce"></el-input>
-          </el-form-item>
-          <el-form-item label="图片临时路径">
-            <el-upload
-              class="upload-demo"
-              action="https://jsonplaceholder.typicode.com/posts/"
-              :on-preview="handlePreview"
-              :on-remove="handleRemove"
-              :before-remove="beforeRemove"
-              multiple
-              :limit="1"
-              :on-exceed="handleExceed"
-              :file-list="newGoods.pics"
-            >
-              <el-button size="small" type="primary">点击上传</el-button>
-            </el-upload>
-          </el-form-item>
-          <el-form-item label="商品的参数">
-            <el-input v-model="newGoods.attrs"></el-input>
-          </el-form-item>
-        </el-form>
-        <span slot="footer" class="dialog-footer">
-          <el-button @click="dialogVisible = false">取 消</el-button>
-          <el-button type="primary" @click="addUser">确 定</el-button>
-        </span>
-      </el-dialog>
       <!-- 表头 -->
       <el-table :data="goods" height="550" border style="width: 100%">
         <el-table-column type="index" label="#" width="50"> </el-table-column>
@@ -98,7 +35,7 @@
               icon="el-icon-edit"
               circle
               size="mini"
-              @click="getUsermsg(scope.row)"
+              @click="editGoods(scope.row.goods_id)"
               @close="unshow"
             ></el-button>
 
@@ -108,7 +45,7 @@
               icon="el-icon-delete"
               circle
               size="mini"
-              @click="showMessage(scope.row.id)"
+              @click="delGoods(scope.row.goods_id)"
             ></el-button>
           </template>
         </el-table-column>
@@ -147,7 +84,7 @@ export default {
         pagenum: 1,
         pagesize: 5,
       },
-      total: "",
+      total: 0,
       goods: [],
       //新增商品
       dialogVisible: false,
@@ -202,12 +139,11 @@ export default {
     async getGoods() {
       const { data } = await this.$http.get("goods", { params: this.params });
       if (!this.$errorDialog(data)) return;
-      console.log(data);
-      this.params.pagenum = data.data.pagenum;
+      this.params.pagenum = parseInt(data.data.pagenum)
       this.total = data.data.total;
       //先将时间格式化再赋值
       data.data.goods.forEach((item) => {
-        item.add_time = this.formattedDate(item.add_time);
+        item.add_time = this.formattedDate(item.add_time)
       });
       this.goods = data.data.goods;
     },
@@ -225,25 +161,33 @@ export default {
     },
     // 分页
     handleSizeChange(pageSize) {
-      this.params.pagesize = pageSize;
-      this.getGoods();
+      this.params.pagesize = pageSize
+      this.getGoods()
     },
     handleCurrentChange(currentPage) {
-      this.params.pagenum = currentPage;
-      this.getGoods();
+      this.params.pagenum = currentPage
+      this.getGoods()
     },
     //添加商品，跳到新路由
     addGoods() {
       this.$router.push({name:'add'})
     },
-    //级联选择器变化时
-    handleChange(){
-      console.log(this.newGoods.goods_cat)
+    //编辑商品
+    async editGoods(id){
+      //根据id找到对应信息，再传过去
+      const {data} = await this.$http.get(`goods/${id}`)
+      if (!this.$errorDialog(data,200)) return;
+      this.$router.push({name:'edit'})
+      this.$nextTick(()=>{
+        this.$bus.$emit('edit',data.data)
+      })
+      
+      
     },
-    //上传图片时
-    handlePreview(file) {
-      console.log(file)
-    },
+    //删除商品
+    delGoods(id){
+      this.$delItem(`goods/${id}`,this.getGoods)
+    }
   },
 };
 </script>

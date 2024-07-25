@@ -67,7 +67,6 @@
             </el-table-column>
             <el-table-column label="操作">
               <template v-slot:="scope">
-                {{scope.row}}
                 <!-- 编辑 -->
                 <el-button
                   type="primary"

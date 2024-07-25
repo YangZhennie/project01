@@ -29,133 +29,120 @@
         :before-leave="beforeleave"
       >
         <el-tab-pane label="基本信息" name="0">
-          <el-form
-            label-position="top"
-            :model="newGoods"
-            :rules="newRules"
-            ref="newGoods"
-            label-width="100px"
-            class="demo-ruleForm"
-          >
-            <el-form-item label="商品名称" prop="goods_name">
-              <el-input v-model="newGoods.goods_name"></el-input>
-            </el-form-item>
-            <el-form-item label="价格" prop="goods_price">
-              <el-input
-                v-model.number="newGoods.goods_price"
-                type="number"
-                min="0"
-              ></el-input>
-            </el-form-item>
-            <el-form-item label="数量" prop="goods_number">
-              <el-input
-                v-model.number="newGoods.goods_number"
-                type="number"
-                min="0"
-              ></el-input>
-            </el-form-item>
-            <el-form-item label="重量" prop="goods_weight">
-              <el-input
-                v-model.number="newGoods.goods_weight"
-                type="number"
-                min="0"
-              ></el-input>
-            </el-form-item>
-            <el-form-item label="','分割的分类列表" prop="goods_cat">
-              <!-- 级联选择器 -->
-              <el-cascader
-                clearable
-                v-model="newGoods.goods_cat"
-                :options="options"
-                :props="propOptions"
-                @change="handleChange"
-              >
-              </el-cascader>
-            </el-form-item>
-          </el-form>
+          <keep-alive>
+            <Infomation ref="Infomation" :activeIndex="activeIndex"></Infomation>
+          </keep-alive>
         </el-tab-pane>
-        <el-tab-pane label="商品参数" name="1">商品参数</el-tab-pane>
-        <el-tab-pane label="商品属性" name="2">商品属性</el-tab-pane>
-        <el-tab-pane label="商品图片" name="3">商品图片</el-tab-pane>
-        <el-tab-pane label="商品内容" name="4">商品内容</el-tab-pane>
-        <el-tab-pane label="完成" name="5">完成</el-tab-pane>
+        <el-tab-pane label="商品参数" name="1">
+          <keep-alive>
+            <ProductParams :cateID="cateID" ref="ProductParams"></ProductParams>
+          </keep-alive>
+        </el-tab-pane>
+        <el-tab-pane label="商品属性" name="2">
+          <keep-alive>
+            <ProductAttributes :cateID="cateID" ref="ProductAttributes"></ProductAttributes>
+          </keep-alive>
+        </el-tab-pane>
+        <el-tab-pane label="商品图片" name="3">
+            <keep-alive>
+            <ProductImages :cateID="cateID" ref="ProductImages"></ProductImages>
+          </keep-alive>
+        </el-tab-pane>
+        <el-tab-pane label="商品内容" name="4">
+          <ProductContent ref="ProductContent"></ProductContent>
+          <el-button type="primary" style="margin:10px 0" @click="addProduct">添加商品</el-button>
+        </el-tab-pane>
       </el-tabs>
     </el-card>
   </div>
 </template>
 
 <script>
+import Infomation from "../RroductInfomation.vue";
+import ProductParams from "../ProductParams.vue";
+import ProductAttributes from "../ProductAttributes.vue";
+import ProductImages from "../ProductImages.vue";
+import ProductContent from "../ProductContent.vue";
+import Completion from "../Completion.vue";
+
 export default {
+  components: {
+    Infomation,
+    ProductParams,
+    ProductAttributes,
+    ProductImages,
+    ProductContent,
+    Completion,
+  },
   data() {
     return {
       activeIndex: "0",
-      // 分类数据
-      options: [],
-      propOptions: {
-        value: "cat_id",
-        label: "cat_name",
-        children: "children",
-      },
-      newGoods: {
-        goods_name: "",
-        goods_cat: [],
-        goods_price: 0,
-        goods_number: 0,
-        goods_weight: 0,
-      },
-      // newGoods: {
-      //     goods_name: "",
-      //     goods_cat: [],
-      //     goods_price: 0,
-      //     goods_number: 0,
-      //     goods_weight: 0,
-      //     goods_introduce: "",
-      //     pics: [],
-      //     attrs: [],
-      // },
-      newRules: {
-        goods_name: [
-          { required: true, message: "不能为空！", trigger: "blur" },
-        ],
-        goods_cat: [{ required: true, message: "不能为空！", trigger: "blur" }],
-        goods_price: [
-          { required: true, message: "不能为空！", trigger: "blur" },
-        ],
-        goods_number: [
-          { required: true, message: "不能为空！", trigger: "blur" },
-        ],
-        goods_weight: [
-          { required: true, message: "不能为空！", trigger: "blur" },
-        ],
-      },
+      //分类id
+      cateID:0,
     };
   },
   mounted() {
-    this.getAllList();
+    this.$bus.$on('getCateID',(id)=>{
+      this.cateID=id
+    })
+  },
+  beforeDestroy(){
+    this.$off('getCateID')
   },
   methods: {
-    // 获取所有分类数据
-    async getAllList() {
-      const { data } = await this.$http.get("categories");
-      // 错误弹窗：返回值false则错误，true则正确
-      if (!this.$errorDialog(data)) return;
-      this.options = data.data;
-    },
-    //级联变化时
-    handleChange() {
-      if (this.newGoods.goods_cat.length !== 3) this.newGoods.goods_cat = [];
-    },
-    //Tab栏切换
+    //Tab栏切换预验证
     beforeleave(newName, oldName) {
       //标识符，通过改变值来决定是否切换，0切1不切
       let flag = 0;
-      //表单一预验证
-      this.$refs.newGoods.validate(async (isTrue, obj) => {
-        if (!isTrue) flag = 1;
-      });
-
-      if (flag === 1) return false;
+      //基本信息：表单一预验证
+      if (oldName === "0") {
+          let infoResult = this.$refs['Infomation'].validateHandle()
+          if (!infoResult) {
+            flag = 1
+            return false
+          }
+      }
     },
+    //添加商品
+    async addProduct(){
+      let addInfo={
+        goods_name:this.$refs['Infomation'].newGoods.goods_name,
+        goods_cat:this.$refs['Infomation'].newGoods.goods_cat.join(','),
+        goods_price:this.$refs['Infomation'].newGoods.goods_price,
+        goods_number:this.$refs['Infomation'].newGoods.goods_number,
+        goods_weight:this.$refs['Infomation'].newGoods.goods_weight,
+        goods_introduce:this.$refs['ProductContent'].content,
+        pics:this.$refs['ProductImages'].pics,
+        attrs:[]
+      }
+      //处理动态参数
+      this.$refs['ProductParams'].paramsList.forEach(item => {
+        const a = {
+          "attr_id":item.attr_id,
+          "attr_value":item.attr_vals.join(',')
+        }
+        addInfo.attrs.push(a)
+      })
+      //处理静态属性
+      this.$refs['ProductAttributes'].onlyList.forEach(item => {
+        const a = {
+          "attr_id":item.attr_id,
+          "attr_value":item.attr_vals
+        }
+        addInfo.attrs.push(a)
+      })
+      //提交到服务器
+      const { data } = await this.$http.post('goods',addInfo)
+      console.log(data);
+        // 错误弹窗：返回值false则错误，true则正确
+        if (!this.$errorDialog(data,201)) return;
+        //提交成功后弹出提示框，重新渲染数据
+        this.$message({
+            message: "添加成功！",
+            type: "success",
+        })
+        this.$router.push('/goods')
+    }
   },
 };
 </script>

@@ -72,4 +72,16 @@ export const delItem = async function (path, getFunction) {
         this.$message.error("删除过程中出现错误，请稍后再试！");
     }
 };
+//转换特定的时间格式
+export const timeChange = function (timestamp){
+    const date = new Date(timestamp);
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    const day = date.getDate().toString().padStart(2, "0");
+    const hour = date.getHours().toString().padStart(2, "0");
+    const minute = date.getMinutes().toString().padStart(2, "0");
+    const second = date.getSeconds().toString().padStart(2, "0");
+    const formattedDate = `${year}-${month}-${day} ${hour}:${minute}:${second}`;
+    return formattedDate;
+};
 

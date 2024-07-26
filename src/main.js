@@ -10,11 +10,12 @@ Vue.component('Bread',Bread)
 
 //导入公共方法
 // 类似全局事件总线，所有组件都能直接调用
-import { errorDialog, addItem, changeItem,delItem} from './common/Common.js'
+import { errorDialog, addItem, changeItem, delItem, timeChange } from './common/Common.js'
 Vue.prototype.$errorDialog = errorDialog
 Vue.prototype.$addItem = addItem
 Vue.prototype.$changeItem = changeItem
 Vue.prototype.$delItem = delItem
+Vue.prototype.$timeChange = timeChange
 
 
 import axios from './plugins/axios.js'

@@ -13,7 +13,7 @@ import params from '../components/routers/Params'
 import goodsList from '../components/routers/GoodsList'
 import add from '../components/routers/Add'
 import edit from '../components/routers/Edit'
-
+import order from '../components/routers/Order'
 Vue.use(VueRouter)
 
 //定义插件
@@ -78,6 +78,11 @@ const router = new VueRouter({
                     name: 'edit',
                     path: '/edit',
                     component:edit
+                },
+                {
+                    name:'order',
+                    path:'/orders',
+                    component:order
                 }
             ]
         },

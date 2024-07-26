@@ -14,6 +14,7 @@ import goodsList from '../components/routers/GoodsList'
 import add from '../components/routers/Add'
 import edit from '../components/routers/Edit'
 import order from '../components/routers/Order'
+import reports from '../components/routers/Report'
 Vue.use(VueRouter)
 
 //定义插件
@@ -83,6 +84,11 @@ const router = new VueRouter({
                     name:'order',
                     path:'/orders',
                     component:order
+                },
+                {
+                    name: 'reports',
+                    path: '/reports',
+                    component: reports
                 }
             ]
         },

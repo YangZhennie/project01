@@ -1,20 +1,38 @@
 import Vue from 'vue'
 //引入插件
 import VueRouter from 'vue-router'
-//引入组件
-import myLogin from '../components/myLogin'
-import myHome from '../components/myHome'
-import welcome from '../views/welcome'
-import users from '../components/routers/users'
-import rights from '../components/routers/Rights'
-import roles from '../components/routers/Roles'
-import category from '../components/routers/Cate'
-import params from '../components/routers/Params'
-import goodsList from '../components/routers/GoodsList'
-import add from '../components/routers/Add'
-import edit from '../components/routers/Edit'
-import order from '../components/routers/Order'
-import reports from '../components/routers/Report'
+//路由懒加载：按功能划分
+const myLogin = () => import(/* webpackChunkName: 'login_home_welcome' */ '../components/myLogin')
+const myHome = () => import(/* webpackChunkName: 'login_home_welcome' */ '../components/myHome')
+const welcome = () => import(/* webpackChunkName: 'login_home_welcome' */ '../views/welcome')
+
+const users = () => import(/* webpackChunkName: 'user_rights_roles' */ '../components/routers/users')
+const rights = () => import(/* webpackChunkName: 'user_rights_roles' */ '../components/routers/Rights')
+const roles = () => import(/* webpackChunkName: 'user_rights_roles' */ '../components/routers/Roles')
+
+const category = () => import(/* webpackChunkName: 'category_params' */ '../components/routers/Cate')
+const params = () => import(/* webpackChunkName: 'category_params' */ '../components/routers/Params')
+
+const goodsList = () => import(/* webpackChunkName: 'goods' */ '../components/routers/GoodsList')
+const add = () => import(/* webpackChunkName: 'goods' */ '../components/routers/Add')
+const edit = () => import(/* webpackChunkName: 'goods' */ '../components/routers/Edit')
+
+const order = () => import(/* webpackChunkName: 'order_report' */ '../components/routers/Order')
+const reports = () => import(/* webpackChunkName: 'order_report' */ '../components/routers/Report')
+
+// import myLogin from '../components/myLogin'
+// import myHome from '../components/myHome'
+// import welcome from '../views/welcome'
+// import users from '../components/routers/users'
+// import rights from '../components/routers/Rights'
+// import roles from '../components/routers/Roles'
+// import category from '../components/routers/Cate'
+// import params from '../components/routers/Params'
+// import goodsList from '../components/routers/GoodsList'
+// import add from '../components/routers/Add'
+// import edit from '../components/routers/Edit'
+// import order from '../components/routers/Order'
+// import reports from '../components/routers/Report'
 Vue.use(VueRouter)
 
 //定义插件

@@ -21,7 +21,6 @@
 <script>
     import Vue from 'vue'
     import { Editor, Toolbar } from '@wangeditor/editor-for-vue'
-
     export default Vue.extend({
         props:['activeIndex','form'],
         components: { Editor, Toolbar },

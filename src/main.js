@@ -2,7 +2,10 @@ import Vue from 'vue'
 import App from './App.vue'
 import router from './plugins/router.js'
 import './assets/css/global.css'
-import './plugins/element.js'
+// import './plugins/element.js'
+import ElementUI from 'element-ui'
+// import 'element-ui/lib/theme-chalk/index.css'
+Vue.use(ElementUI)
 
 //引入全局组件
 import Bread from './components/common/breadcrumb'
